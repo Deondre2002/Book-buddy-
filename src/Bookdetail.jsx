@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
-const API = "https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api";
+const Api = "https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api";
 
 export default function Bookdetail({ token }) {
   const { id } = useParams(); // get the :id from URL
@@ -16,7 +16,7 @@ export default function Bookdetail({ token }) {
     if (!id) {
       async function fetchBooks() {
         try {
-          const res = await fetch(`${API}/books`);
+          const res = await fetch(`${Api}/books`);
           const data = await res.json();
           setBooks(data.books || []);
         } catch (err) {
@@ -33,7 +33,7 @@ export default function Bookdetail({ token }) {
     if (id) {
       async function fetchBook() {
         try {
-          const res = await fetch(`${API}/books/${id}`);
+          const res = await fetch(`${Api}/books/${id}`);
           const data = await res.json();
           setBook(data.book);
         } catch (err) {
@@ -55,7 +55,7 @@ export default function Bookdetail({ token }) {
     setReserving(true);
 
     try {
-      const res = await fetch(`${API}/reservations`, {
+      const res = await fetch(`${Api}/reservations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
