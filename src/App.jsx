@@ -1,19 +1,24 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Bookdetail from "./Bookdetail";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "./index.css";
+import Bookdetail from "./Bookdetail";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <nav style={{ textAlign: "center", margin: "20px" }}>
+        <Link to="/">Home</Link> | <Link to="/books">Books</Link>
+      </nav>
+
       <Routes>
         <Route
           path="/"
           element={
-            <div className="center">
-              <h1>Welcome to Book Buddy!</h1>
-            </div>
+            <h1 style={{ textAlign: "center" }}>Welcome to Book Buddy!</h1>
           }
         />
+
+        <Route path="/books" element={<Bookdetail />} />
+
         <Route path="/books/:id" element={<Bookdetail />} />
       </Routes>
     </BrowserRouter>
