@@ -40,6 +40,7 @@ export default function AccountReservation({ token }) {
       });
       if (res.ok) {
         setMessage("Book returned");
+        setTimeout(() => setMessage(""), 120);
         setReservations(reservations.filter((r) => r.id !== id));
       } else {
         setMessage("Error returning book.");
@@ -69,7 +70,11 @@ export default function AccountReservation({ token }) {
           ))}
         </ul>
       )}
-      {message && <p>{message}</p>}
+      {message && (
+        <p style={{ color: message.includes("error") ? "red" : "green" }}>
+          {message}
+        </p>
+      )}
     </div>
   );
 }
