@@ -11,65 +11,85 @@ export default function AccountReservation({ token }) {
   useEffect(() => {
     async function fetchReservations() {
       try {
-        const res = await fetch(`${Api}/users/me`, {
+        const res = await fetch(`${Api}/reservations`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
+
         const data = await res.json();
-        setReservations(data.reservations || []);
+
+        if (res.ok) {
+          setReservations(data.reservations || []);
+        } else {
+          setError(data.message || "Failed to load reservations");
+        }
       } catch (err) {
-        setError("Couldn't load reservations at this time.");
+        setError("Unable to load reservations");
       } finally {
         setLoading(false);
       }
     }
 
-    if (token) fetchReservations();
+    if (token) {
+      fetchReservations();
+    } else {
+      setMessage("Please log in to view your reservations.");
+      setLoading(false);
+    }
   }, [token]);
 
-  async function handleReturn(id) {
+  async function handleReturn(reservationId) {
     try {
-      const res = await fetch(`${Api}/reservations/${id}`, {
+      const res = await fetch(`${Api}/reservations/${reservationId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
+
+      const data = await res.json();
+
       if (res.ok) {
-        setMessage("Book returned");
-        setReservations(reservations.filter((r) => r.id !== id));
+        setReservations(reservations.filter((r) => r.id !== reservationId));
+        setMessage("Book returned successfully!");
       } else {
-        setMessage("Error returning book.");
+        setMessage(data.message || "Failed to return the book.");
       }
     } catch (err) {
-      setMessage("Network error while returning book.");
+      setMessage("Error returning book");
     }
   }
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p>Loading reservations...</p>;
   if (error) return <p>{error}</p>;
 
   return (
     <div style={{ textAlign: "center", marginTop: "20px" }}>
       <h1>My Reservations</h1>
-      {reservations.length === 0 ? (
-        <p>You have no books reserved at the moment</p>
-      ) : (
+
+      {message && <p>{message}</p>}
+
+      {reservations.length > 0 ? (
         <ul style={{ listStyle: "none", padding: 0 }}>
-          {reservations.map((r) => (
-            <li key={r.id} style={{ margin: "10px 0" }}>
-              <strong>{r.book.title}</strong> by {r.book.author}
-              <div>
-                <button onClick={() => handleReturn(r.id)}>return</button>
-              </div>
+          {reservations.map((res) => (
+            <li key={res.id} style={{ margin: "15px 0" }}>
+              <strong>{res.book.title}</strong> by {res.book.author}
+              <br />
+              <button
+                onClick={() => handleReturn(res.id)}
+                style={{ marginTop: "8px" }}
+              >
+                Return Book
+              </button>
             </li>
           ))}
         </ul>
+      ) : (
+        <p>No current reservations.</p>
       )}
-      {message && <p>{message}</p>}
     </div>
   );
 }
