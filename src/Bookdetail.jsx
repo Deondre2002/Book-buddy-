@@ -1,40 +1,59 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
-const API = "https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api";
+const Api = "https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api";
 
 export default function Bookdetail({ token }) {
   const { id } = useParams();
+  const isListView = !id;
+  const [books, setBooks] = useState([]);
   const [book, setBook] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [reserving, setReserving] = useState(false);
+
+  console.log("Params ID:", id);
+  console.log("Is list view:", isListView);
 
   useEffect(() => {
-    async function getBookDetails() {
+    async function fetchData() {
       try {
-        const res = await fetch(
-          `https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/books/${id}`
-        );
-        const data = await res.json();
-        console.log(data);
-        setBook(data);
+        setLoading(true);
+        let response, data;
+
+        if (isListView) {
+          response = await fetch(`${Api}/books`);
+          data = await response.json();
+          console.log("Fetched books:", data);
+          setBooks(Array.isArray(data) ? data : data.books || []);
+        } else {
+          response = await fetch(`${Api}/books/${id}`);
+          data = await response.json();
+          console.log("Fetched book:", data);
+          setBook(data.book || data);
+        }
       } catch (err) {
-        setError("Failed to load details");
+        console.error("Fetch error:", err);
+        setError("Unable to load books");
       } finally {
         setLoading(false);
       }
     }
-    getBookDetails();
-  }, [id]);
+
+    fetchData();
+  }, [id, isListView]);
 
   async function handleReserve() {
     if (!token) {
       setMessage("Log in to reserve a book.");
       return;
     }
+
+    setReserving(true);
+
     try {
-      const res = await fetch(`${API}/reservations`, {
+      const res = await fetch(`${Api}/reservations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,21 +61,47 @@ export default function Bookdetail({ token }) {
         },
         body: JSON.stringify({ bookId: id }),
       });
+
       const data = await res.json();
+
       if (res.ok) {
-        setMessage(" Book reserved!");
+        setMessage("Book reserved!");
         setBook({ ...book, available: false });
       } else {
         setMessage(data.message || "Already reserved or unavailable.");
       }
     } catch (err) {
       setMessage("Error reserving book");
+    } finally {
+      setReserving(false);
     }
   }
 
-  if (loading) return <p>loading...</p>;
-  if (error) return <p> {error}</p>;
-  if (!book) return <p> no book found.</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
+  if (isListView) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <h1>All Books</h1>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {Array.isArray(books) && books.length > 0 ? (
+            books.map((b) => (
+              <li key={b.id} style={{ margin: "10px 0" }}>
+                <Link to={`/books/${b.id}`}>
+                  {b.title} by {b.author}
+                </Link>
+              </li>
+            ))
+          ) : (
+            <p>No books found.</p>
+          )}
+        </ul>
+      </div>
+    );
+  }
+
+  if (!book) return <p>No book found.</p>;
 
   return (
     <div style={{ textAlign: "center", marginTop: "20px" }}>
@@ -66,9 +111,14 @@ export default function Bookdetail({ token }) {
       <p>
         <strong>Status:</strong> {book.available ? "Available" : "Unavailable"}
       </p>
+
       {book.available && (
-        <button onClick={handleReserve}>Reserve this book</button>
+        <button onClick={handleReserve} disabled={reserving}>
+          {reserving ? "Reserving..." : "Reserve this book"}
+        </button>
       )}
+
+      {!token && <p>Please log in to reserve this book.</p>}
       {message && <p>{message}</p>}
     </div>
   );
