@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import Reserve from "./Reserve";
 
 const Api = "https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api";
 
@@ -43,39 +44,6 @@ export default function Bookdetail({ token }) {
 
     fetchData();
   }, [id, isListView]);
-
-  async function handleReserve() {
-    if (!token) {
-      setMessage("Log in to reserve a book.");
-      return;
-    }
-
-    setReserving(true);
-
-    try {
-      const res = await fetch(`${Api}/reservations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ bookId: id }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage("Book reserved!");
-        setBook({ ...book, available: false });
-      } else {
-        setMessage(data.message || "Already reserved or unavailable.");
-      }
-    } catch (err) {
-      setMessage("Error reserving book");
-    } finally {
-      setReserving(false);
-    }
-  }
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
