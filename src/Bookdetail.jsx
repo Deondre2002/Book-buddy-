@@ -12,10 +12,6 @@ export default function Bookdetail({ token }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [reserving, setReserving] = useState(false);
-
-  console.log("Params ID:", id);
-  console.log("Is list view:", isListView);
 
   useEffect(() => {
     async function fetchData() {
@@ -26,16 +22,13 @@ export default function Bookdetail({ token }) {
         if (isListView) {
           response = await fetch(`${Api}/books`);
           data = await response.json();
-          console.log("Fetched books:", data);
           setBooks(Array.isArray(data) ? data : data.books || []);
         } else {
           response = await fetch(`${Api}/books/${id}`);
           data = await response.json();
-          console.log("Fetched book:", data);
           setBook(data.book || data);
         }
       } catch (err) {
-        console.error("Fetch error:", err);
         setError("Unable to load books");
       } finally {
         setLoading(false);
@@ -81,9 +74,14 @@ export default function Bookdetail({ token }) {
       </p>
 
       {book.available && (
-        <button onClick={handleReserve} disabled={reserving}>
-          {reserving ? "Reserving..." : "Reserve this book"}
-        </button>
+        <Reserve
+          token={token}
+          bookId={id}
+          onReserve={() => {
+            setBook({ ...book, available: false });
+            setMessage("Book reserved!");
+          }}
+        />
       )}
 
       {!token && <p>Please log in to reserve this book.</p>}
