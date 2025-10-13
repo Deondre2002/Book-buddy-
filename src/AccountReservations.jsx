@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Return from "./Return";
 
 const Api = "https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api";
 
@@ -67,28 +68,26 @@ export default function AccountReservation({ token }) {
   if (error) return <p>{error}</p>;
 
   return (
-    <div style={{ textAlign: "center", marginTop: "20px" }}>
-      <h1>My Reservations</h1>
-
-      {message && <p>{message}</p>}
-
+    <div>
+      <h2>My Reservations</h2>
       {reservations.length > 0 ? (
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {reservations.map((res) => (
-            <li key={res.id} style={{ margin: "15px 0" }}>
+        reservations.map((res) => (
+          <div key={res.id} style={{ marginBottom: "20px" }}>
+            <p>
               <strong>{res.book.title}</strong> by {res.book.author}
-              <br />
-              <button
-                onClick={() => handleReturn(res.id)}
-                style={{ marginTop: "8px" }}
-              >
-                Return Book
-              </button>
-            </li>
-          ))}
-        </ul>
+            </p>
+
+            <Return
+              token={token}
+              reservationId={res.id}
+              onReturn={(id) =>
+                setReservations(reservations.filter((r) => r.id !== id))
+              }
+            />
+          </div>
+        ))
       ) : (
-        <p>No current reservations.</p>
+        <p>No reservations were found.</p>
       )}
     </div>
   );
