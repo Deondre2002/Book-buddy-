@@ -5,9 +5,9 @@ import App from "./App.jsx";
 import { AuthProvider } from "./RoleA/AuthContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <AuthProvider>
   <StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </StrictMode>
-  </AuthProvider>
 );
