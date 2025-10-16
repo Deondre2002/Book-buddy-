@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Navbar from "../Components/Navbar";
-import BooksPage from "../Pages/BooksPage";
-import LoginPage from "../Pages/LoginPage";
-import RegisterPage from "../Pages/RegisterPage";
-import AccountPage from "../Pages/AccountPage";
-import NotFoundPage from "../Pages/NotFoundPage";
+import Navbar from "./Components/Navbar.jsx";
+import BooksPage from "../Pages/BooksPage.jsx";
+import LoginPage from "../Pages/LoginPage.jsx";
+import RegisterPage from "../Pages/RegisterPage.jsx";
+import AccountPage from "../Pages/AccountPage.jsx";
+import NotFoundPage from "../Pages/NotFoundPage.jsx";
 
 export default function AppRouter() {
   return (

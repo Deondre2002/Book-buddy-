@@ -1,0 +1,1 @@
+export default function Navbar(){return (<nav style={{padding:"1rem",background:"#eee"}}><a href="/books" style={{marginRight:12}}>Books</a><a href="/login" style={{marginRight:12}}>Login</a><a href="/register">Register</a></nav>);}

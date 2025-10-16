@@ -9,7 +9,6 @@ export default function BooksPage() {
   useEffect(() => {
     setStatus("loading");
 
-    // 🧠 temporary fake book list (mock data)
     setTimeout(() => {
       const fakeBooks = [
         { id: 1, title: "Dune", author: "Frank Herbert", available: true },
